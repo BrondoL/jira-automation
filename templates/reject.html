@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reject</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-red-50 p-10 min-h-screen flex flex-col justify-center justify-items-center">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold text-red-600">Ticket Rejected</h1>
+    <p class="mt-4 text-lg">The ticket has been rejected.</p>
+    <p class="mt-2 text-sm"><strong>Summary</strong>: {{ response['Summary'] }}</p>
+    <p class="mt-2 text-sm"><strong>Assignee</strong>: {{ response['Assignee'] }}</p>
+    <p class="mt-2 text-sm"><strong>Reporter</strong>: {{ response['Reporter'] }}</p>
+    <p class="mt-2 text-sm"><strong>Priority</strong>: {{ response['Assignee'] }}</p>
+  </div>
+</body>
+
+</html>

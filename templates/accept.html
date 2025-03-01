@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approve</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-green-50 p-10 min-h-screen flex flex-col justify-center justify-items-center">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold text-green-600">Ticket Accepted!</h1>
+    <p class="mt-4 text-lg">The ticket has been successfully created.</p>
+    <p class="mt-2 text-sm"><strong>Summary</strong>: {{ data['Summary'] }}</p>
+    <p class="mt-2 text-sm"><strong>Assignee</strong>: {{ data['Assignee'] }}</p>
+    <p class="mt-2 text-sm"><strong>Reporter</strong>: {{ data['Reporter'] }}</p>
+    <p class="mt-2 text-sm"><strong>Priority</strong>: {{ data['Assignee'] }}</p>
+
+    <div class="mt-6">
+      <p class="text-lg font-semibold">You can view the ticket here:</p>
+      <a href="{{ jira_url }}" class="text-blue-500 hover:underline">Go to Jira Ticket</a>
+    </div>
+  </div>
+</body>
+
+</html>
