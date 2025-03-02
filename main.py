@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from config import Config
@@ -46,6 +46,11 @@ api, web = create_routes(
 )
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(web)
+
+@app.after_request
+def log_response_info(response):
+    app.logger.info(f'"{request.method} {request.url}" | {response.status} | IP: {request.remote_addr}')
+    return response
 
 @app.errorhandler(404)
 def not_found_error(error):

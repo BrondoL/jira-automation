@@ -10,7 +10,7 @@ class JiraService:
     def get_tickets_in_progress(self):
         tickets = self.repository.find_tickets_in_progress()
 
-        if len(tickets):
+        if not len(tickets):
             logging.warning("Jira Ticket (In Progress) is empty!")
 
         return tickets
@@ -18,7 +18,7 @@ class JiraService:
     def get_tickets_done(self):
         tickets = self.repository.find_tickets_done_this_month()
 
-        if len(tickets):
+        if not len(tickets):
             logging.warning("Jira Ticket (Done) is empty!")
 
         return tickets
@@ -26,8 +26,15 @@ class JiraService:
     def get_tickets_today(self):
         tickets = self.repository.find_tickets_created_today()
 
-        if len(tickets):
+        if not len(tickets):
             logging.warning("Jira Ticket (Today) is empty!")
+
+        return tickets
+
+    def get_incomplete_tickets(self):
+        tickets = self.repository.find_incomplete_tickets()
+        if not len(tickets):
+            logging.warning("Jira Ticket (Incomplete) is empty!")
 
         return tickets
 

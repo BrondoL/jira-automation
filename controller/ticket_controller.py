@@ -95,3 +95,16 @@ class TicketController:
         except Exception as e:
             logging.error(f"error: {e}", exc_info=True)
             return jsonify({"message": "Internal Server Error"}), 500
+
+    def incomplete(self):
+        try:
+            tickets = self.jira_service.get_incomplete_tickets()
+            if not len(tickets):
+                return jsonify({"message": "no incomplete tickets"})
+
+            self.send_message_to_team_service.send_message_for_incomplete_ticket(tickets, Config.JIRA_URL)
+
+            return jsonify(tickets)
+        except Exception as e:
+            logging.error(f"error: {e}", exc_info=True)
+            return jsonify({"message": "Internal Server Error"}), 500

@@ -23,5 +23,12 @@ class JiraRepository():
 
         return self.jira_client.search_jira_issues(query, field, max_result)
 
+    def find_incomplete_tickets(self):
+        query = '("Story Points" is empty or description is EMPTY or parent is EMPTY or assignee is EMPTY or "Team[Team]" is EMPTY) and (created >= startOfMonth() and created <= endOfMonth())'
+        field = "assignee,summary"
+        max_result = 100
+
+        return self.jira_client.search_jira_issues(query, field, max_result)
+
     def create_issue(self, data, account_id):
         return self.jira_client.create_issue(data, account_id)

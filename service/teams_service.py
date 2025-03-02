@@ -126,3 +126,23 @@ class SendTeamsMessageService:
         ok = self.repository.send_message_for_accept(user, response, ticket_key)
         if not ok:
             logging.warning(f"Error when notify accept this ticket: {response['__PowerAppsId__']}")
+
+    def send_message_for_incomplete_ticket(self, responses, jira_url):
+        formatted_response = ""
+        for idx, ticket in enumerate(responses):
+            username = get_value(ticket["fields"]["assignee"], "displayName")
+            alias = "NaN"
+            if username:
+                user = get_user(username)
+                if user:
+                    alias = user["alias"]
+
+            summary = get_value(ticket["fields"], "summary")
+            number = ticket["key"]
+            link = f"{jira_url}/browse/{number}"
+
+            formatted_response += f"{idx+1}. [{alias}] - [{summary}]({link})\r"
+
+        ok = self.repository.send_message_for_incomplete(formatted_response)
+        if not ok:
+            logging.warning(f"Error when notify incomplete ticket")

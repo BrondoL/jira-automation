@@ -576,3 +576,69 @@ class TeamsRepositoryRepository():
         )
 
         return response.status_code == 202
+
+    def send_message_for_incomplete(self, tickets):
+        payload = {
+            "type": "message",
+            "attachments": [
+                {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": None,
+                "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.5",
+                    "body": [
+                    {
+                        "type": "TextBlock",
+                        "text": "⚠️ **Incomplete Jira Tickets Notification** ⚠️",
+                        "size": "Large",
+                        "wrap": True,
+                        "style": "heading",
+                        "horizontalAlignment": "Center",
+                        "color": "Attention"
+                    },
+                    {
+                        "type": "ColumnSet",
+                        "columns": [
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                            {
+                                "type": "TextBlock",
+                                "size": "Medium",
+                                "weight": "Bolder",
+                                "text": "**Jira Tickets with Missing Fields**"
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": "The following Jira tickets are missing important fields. Please review and update them accordingly:",
+                                "wrap": True
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": tickets,
+                                "wrap": True
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "Please make sure all required fields are completed to ensure smooth tracking of Jira tickets. Thank you for your cooperation! 😊",
+                        "wrap": True
+                    }
+                    ]
+                }
+                }
+            ]
+        }
+
+        response = requests.post(
+            self.webhook_url,
+            json=payload
+        )
+
+        return response.status_code == 202

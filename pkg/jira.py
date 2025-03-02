@@ -81,6 +81,10 @@ class JiraClient:
                 "issuetype": {
                     "name": self.issue_type
                 },
+                "parent": {
+                    "key": "DAS-7286"
+                },
+				"customfield_10028": 2.0,
                 "summary": data["Summary"],
                 "description": {
                     "content": [
