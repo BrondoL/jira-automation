@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Expose port 8000 inside the container to port 8000 on your machine
+    environment:
+      - HOST=127.0.0.1
+      - PORT=8000
+      - BASE_URL=http://127.0.0.1:8000
+      - SECRET_TOKEN=rahasia
+      - WEBHOOK_URL=http://webhook
+      - JIRA_URL=http://jira.com
+      - JIRA_USER=johndoe@gmail.com
+      - JIRA_API_TOKEN=useyourtoken
+      - JIRA_PROJECT_KEY=PLR
+      - JIRA_ISSUE_TYPE=Task
+      - JIRA_TEAM_ID=6ca6a72f
+      - SHEET_ID=asdasd
+      - SHEET_CREDENTIAL_FILE=credentials.json
+    volumes:
+      - .:/app  # Mount the local directory to /app in the container
+    command: ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "main:app"]  # Run with Gunicorn
