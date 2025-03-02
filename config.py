@@ -23,7 +23,7 @@ class Config:
   SHEET_CREDENTIAL_FILE = os.getenv('SHEET_CREDENTIAL_FILE')
 
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.INFO,
     format='%(levelname)s: %(asctime)s pid:%(process)s module:%(module)s %(message)s',
     datefmt='%d/%m/%y %H:%M:%S',
 )

@@ -26,6 +26,7 @@ class TicketController:
                     data = response
                     break
 
+            logging.info(f"Data: {data}")
             if not data:
                 return render_template('not_found.html')
 
@@ -44,6 +45,7 @@ class TicketController:
     def reject(self, id):
         try:
             response = delete_response(id)
+            logging.info(f"Response: {response}")
             if not response:
                 return render_template('not_found.html')
 

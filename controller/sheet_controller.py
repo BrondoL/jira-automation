@@ -19,6 +19,8 @@ class GoogleSheetController:
     def get_all_responses(self):
         try:
             responses = self.get_all_responses_service.execute()
+            if not len(responses):
+                return jsonify({"message": "no response found in google sheets"}), 404
 
             self.send_message_to_team_service.send_message_for_new_ticket(responses)
 

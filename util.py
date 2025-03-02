@@ -42,6 +42,7 @@ def delete_response(id):
             updated_responses.append(response)
 
     # If the length of updated_responses is less than the original, then we have deleted an entry
+    logging.info(f"length updated_response: {len(updated_responses)}, length responses: {len(responses)}")
     if len(updated_responses) < len(responses):
         # Save the updated list back to the file
         update_response(updated_responses)
