@@ -15,3 +15,6 @@ run-docker:
 # Menjalankan aplikasi dengan Docker Compose
 run-docker-compose:
 	docker-compose up -d
+
+stop-docker-compose:
+	docker-compose down
