@@ -42,6 +42,7 @@ class SendTeamsMessageService:
             formatted_in_progress = "♻️ No tickets in backlog"
 
         users = {}
+        tickets = {}
         formatted_done = ""
         for idx, ticket in enumerate(done):
             name = get_value(ticket["fields"]["assignee"], "displayName")
@@ -52,8 +53,10 @@ class SendTeamsMessageService:
 
             if name in users:
                 users[name] += pts
+                tickets[name] += 1
             else:
                 users[name] = pts
+                tickets[name] = 1
 
         sorted_users_desc = dict(sorted(users.items(), key=lambda item: item[1], reverse=True))
         idx = 0
@@ -61,7 +64,7 @@ class SendTeamsMessageService:
             if idx < 3:
                 name = f"**{name}**"
 
-            formatted_done += f"{idx+1}. {name} - {pts} pts\r"
+            formatted_done += f"{idx+1}. {name} - {tickets[name]} tickets - {pts} pts\r"
             idx += 1
 
         if formatted_done == "":
@@ -69,7 +72,7 @@ class SendTeamsMessageService:
 
         ok = self.repository.send_message_for_morning_update(formatted_in_progress, formatted_done)
         if not ok:
-            logging.warning(f"Error when notify morning updates")
+            logging.warning("Error when notify morning updates")
 
     def send_message_for_evening_update(self, today, not_ack):
         formatted_today = ""
@@ -145,4 +148,4 @@ class SendTeamsMessageService:
 
         ok = self.repository.send_message_for_incomplete(formatted_response)
         if not ok:
-            logging.warning(f"Error when notify incomplete ticket")
+            logging.warning("Error when notify incomplete ticket")
