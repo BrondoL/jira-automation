@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/app  # Mount the local directory to /app in the container
     command: ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "main:app"]  # Run with Gunicorn
+    restart: always  # Restart the container if it crashes
 
   nginx:
     image: nginx:latest

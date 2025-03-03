@@ -18,3 +18,8 @@ run-docker-compose:
 
 stop-docker-compose:
 	docker-compose down
+
+update:
+	git pull
+	docker-compose down
+	docker-compose up --build -d
