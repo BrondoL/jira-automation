@@ -107,6 +107,9 @@ class JiraClient:
                 "assignee": {
                     "id": account_id
                 },
+                "reporter": {
+                    "id": account_id
+                },
                 "customfield_10238": {
                     "value": data["Level"]
                 },
