@@ -61,10 +61,11 @@ class SendTeamsMessageService:
         sorted_users_desc = dict(sorted(users.items(), key=lambda item: item[1], reverse=True))
         idx = 0
         for name, pts in sorted_users_desc.items():
+            bold_name = name
             if idx < 3:
-                name = f"**{name}**"
+                bold_name = f"**{name}**"
 
-            formatted_done += f"{idx+1}. {name} - {tickets[name]} tickets - {pts} pts\r"
+            formatted_done += f"{idx+1}. {bold_name} - {tickets[name]} tickets - {pts} pts\r"
             idx += 1
 
         if formatted_done == "":
