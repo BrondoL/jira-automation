@@ -3,6 +3,7 @@ import logging
 import os
 
 response_path = "responses.json"
+result_path = "results.json"
 user_path = "users.json"
 
 def get_responses():
@@ -81,3 +82,32 @@ def get_value(data, key, default_value=None):
         return default_value
 
     return None
+
+def get_results():
+    # Read existing data from the JSON file if it exists
+    if os.path.exists(result_path):
+        with open(result_path, "r") as json_file:
+            existing_data = json.load(json_file)
+    else:
+        existing_data = []
+
+    return existing_data
+
+def get_result(id):
+    results = get_results()
+
+    if id not in results:
+        return None
+
+    return results[id]
+
+def save_result(response, ticket_number=None):
+    data = get_results()
+
+    response["key"] = ticket_number
+    # Append the new response data to the existing data
+    data[response["__PowerAppsId__"]] = {key: value for key, value in response.items() if key != "__PowerAppsId__"}
+
+    # Write the updated data back to the JSON file
+    with open(result_path, "w") as json_file:
+        json.dump(data, json_file, indent=4)
