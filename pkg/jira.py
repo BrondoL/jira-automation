@@ -111,7 +111,7 @@ class JiraClient:
                     "id": account_id
                 },
                 "customfield_10238": {
-                    "value": data["Level"]
+                    "value": "Easy"
                 },
                 "customfield_10001": self.team_id
             }
