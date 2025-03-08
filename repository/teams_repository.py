@@ -251,9 +251,9 @@ class TeamsRepositoryRepository():
         mention_entities = []
         for idx, key in enumerate(users):
             if idx == 0:
-                mention_names += f"cc <at>{users[key]["name"]}</at>"
+                mention_names += f"cc <at>{users[key]['name']}</at>"
             else:
-                mention_names += f", <at>{users[key]["name"]}</at>"
+                mention_names += f", <at>{users[key]['name']}</at>"
 
             entity = {
                 "type": "mention",
@@ -605,9 +605,9 @@ class TeamsRepositoryRepository():
         mention_entities = []
         for idx, key in enumerate(users):
             if idx == 0:
-                mention_names += f"cc <at>{users[key]["name"]}</at>"
+                mention_names += f"cc <at>{users[key]['name']}</at>"
             else:
-                mention_names += f", <at>{users[key]["name"]}</at>"
+                mention_names += f", <at>{users[key]['name']}</at>"
 
             entity = {
                 "type": "mention",
