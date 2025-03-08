@@ -93,6 +93,7 @@ class SendTeamsMessageService:
         if formatted_today == "":
             formatted_today = "♻️ No one made a ticket today"
 
+        users = {}
         formatted_not_ack = ""
         for idx, ticket in enumerate(not_ack):
             username = ticket["Assignee"]
@@ -100,6 +101,11 @@ class SendTeamsMessageService:
             alias = "NaN"
             if user:
                 alias = user["alias"]
+                if alias not in users:
+                    users[alias] = {
+                        "name": user["name"],
+                        "email": user["email"],
+                    }
 
             priority = ticket["Priority"]
             summary = ticket["Summary"]
@@ -109,7 +115,7 @@ class SendTeamsMessageService:
         if formatted_not_ack == "":
             formatted_not_ack = "♻️ All tickets have been acknowledged"
 
-        ok = self.repository.send_message_for_evening_update(formatted_today, formatted_not_ack)
+        ok = self.repository.send_message_for_evening_update(formatted_today, formatted_not_ack, users)
         if not ok:
             logging.warning(f"Error when notify evening updates")
 
@@ -133,6 +139,7 @@ class SendTeamsMessageService:
 
     def send_message_for_incomplete_ticket(self, responses, jira_url):
         formatted_response = ""
+        users = {}
         for idx, ticket in enumerate(responses):
             username = get_value(ticket["fields"]["assignee"], "displayName")
             alias = "NaN"
@@ -140,6 +147,11 @@ class SendTeamsMessageService:
                 user = get_user(username)
                 if user:
                     alias = user["alias"]
+                    if alias not in users:
+                        users[alias] = {
+                            "name": user["name"],
+                            "email": user["email"],
+                        }
 
             summary = get_value(ticket["fields"], "summary")
             number = ticket["key"]
@@ -147,6 +159,6 @@ class SendTeamsMessageService:
 
             formatted_response += f"{idx+1}. [{alias}] - [{summary}]({link})\r"
 
-        ok = self.repository.send_message_for_incomplete(formatted_response)
+        ok = self.repository.send_message_for_incomplete(formatted_response, users)
         if not ok:
             logging.warning("Error when notify incomplete ticket")
