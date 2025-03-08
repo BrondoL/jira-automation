@@ -246,7 +246,26 @@ class TeamsRepositoryRepository():
 
         return response.status_code == 202
 
-    def send_message_for_evening_update(self, today, not_ack):
+    def send_message_for_evening_update(self, today, not_ack, users):
+        mention_names = ""
+        mention_entities = []
+        for idx, key in enumerate(users):
+            if idx == 0:
+                mention_names += f"cc <at>{users[key]["name"]}</at>"
+            else:
+                mention_names += f", <at>{users[key]["name"]}</at>"
+
+            entity = {
+                "type": "mention",
+                "text": f"<at>{users[key]['name']}</at>",
+                "mentioned": {
+                    "id": users[key]["email"],
+                    "name": users[key]["name"]
+                }
+            }
+
+            mention_entities.append(entity)
+
         payload = {
             "type": "message",
             "attachments": [
@@ -304,6 +323,11 @@ class TeamsRepositoryRepository():
                                 "type": "TextBlock",
                                 "text": not_ack,
                                 "wrap": True
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": mention_names,
+                                "wrap": True
                             }
                             ]
                         }
@@ -315,7 +339,10 @@ class TeamsRepositoryRepository():
                         "wrap": True,
                         "color": "Warning"
                     }
-                    ]
+                    ],
+                    "msteams": {
+                        "entities": mention_entities
+                    }
                 }
                 }
             ]
@@ -573,7 +600,26 @@ class TeamsRepositoryRepository():
 
         return response.status_code == 202
 
-    def send_message_for_incomplete(self, tickets):
+    def send_message_for_incomplete(self, tickets, users):
+        mention_names = ""
+        mention_entities = []
+        for idx, key in enumerate(users):
+            if idx == 0:
+                mention_names += f"cc <at>{users[key]["name"]}</at>"
+            else:
+                mention_names += f", <at>{users[key]["name"]}</at>"
+
+            entity = {
+                "type": "mention",
+                "text": f"<at>{users[key]['name']}</at>",
+                "mentioned": {
+                    "id": users[key]["email"],
+                    "name": users[key]["name"]
+                }
+            }
+
+            mention_entities.append(entity)
+
         payload = {
             "type": "message",
             "attachments": [
@@ -616,6 +662,11 @@ class TeamsRepositoryRepository():
                                 "type": "TextBlock",
                                 "text": tickets,
                                 "wrap": True
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": mention_names,
+                                "wrap": True
                             }
                             ]
                         }
@@ -626,7 +677,10 @@ class TeamsRepositoryRepository():
                         "text": "Please make sure all required fields are completed to ensure smooth tracking of Jira tickets. Thank you for your cooperation! 😊",
                         "wrap": True
                     }
-                    ]
+                    ],
+                    "msteams": {
+                        "entities": mention_entities
+                    }
                 }
                 }
             ]
