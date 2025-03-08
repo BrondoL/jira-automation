@@ -30,5 +30,12 @@ class JiraRepository():
 
         return self.jira_client.search_jira_issues(query, field, max_result)
 
-    def create_issue(self, data, account_id):
-        return self.jira_client.create_issue(data, account_id)
+    def create_issue(self, data, assignee_id, reporter_id):
+        return self.jira_client.create_issue(data, assignee_id, reporter_id)
+
+    def find_user(self, email):
+        users = self.jira_client.search_user(email)
+        if not len(users):
+            return None
+
+        return users[0]
