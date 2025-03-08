@@ -46,7 +46,17 @@ class JiraService:
         account_id = user["id"]
         if not account_id:
             raise Exception("Assignee doesn't have an ID")
+        reporter_id = account_id
 
-        response = self.repository.create_issue(data, account_id)
+        email = data["Reporter"]
+        if email != user["email"]:
+            reporter = self.repository.find_user(email)
+            if not reporter:
+                logging.warning("Reporter not found in Jira")
+            else:
+                reporter_id = reporter["accountId"]
+
+
+        response = self.repository.create_issue(data, account_id, reporter_id)
 
         return response

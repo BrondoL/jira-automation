@@ -24,6 +24,7 @@ class JiraClient:
         # Search URL for Jira API
         self.search_url = f'{self.base_url}/rest/api/3/search/jql'
         self.create_url = f'{self.base_url}/rest/api/3/issue'
+        self.search_user_url = f'{self.base_url}/rest/api/3/user/search'
 
     def _create_basic_auth_header(self) -> Dict:
         """
@@ -68,7 +69,7 @@ class JiraClient:
         data = response.json()
         return data.get('issues', [])
 
-    def create_issue(self, data, account_id):
+    def create_issue(self, data, account_id, reporter_id):
         reporter = data["Reporter"]
         description = data["Description"] + f"\n\nReporter: {reporter}"
         priority = data["Priority"].split(" - ")[0]
@@ -108,7 +109,7 @@ class JiraClient:
                     "id": account_id
                 },
                 "reporter": {
-                    "id": account_id
+                    "id": reporter_id
                 },
                 "customfield_10238": {
                     "value": "Easy"
@@ -126,6 +127,20 @@ class JiraClient:
         if response.status_code != 201:
             print(payload)
             raise Exception(f"Failed to create issue({response.status_code}): {response.text}")
+
+        data = response.json()
+        return data
+
+    def search_user(self, email):
+        params = {
+            'query': email
+        }
+
+        # Make the GET request with basic authentication header
+        response = requests.get(self.search_user_url, headers=self.auth_header, params=params)
+
+        if response.status_code != 200:
+            raise Exception(f"Failed to fetch user: {response.text}")
 
         data = response.json()
         return data
