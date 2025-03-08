@@ -90,10 +90,6 @@ class TeamsRepositoryRepository():
                                     {
                                         "title": "Priority:",
                                         "value": data["Priority"]
-                                    },
-                                    {
-                                        "title": "Task Level:",
-                                        "value": data["Level"]
                                     }
                                 ]
                             },
