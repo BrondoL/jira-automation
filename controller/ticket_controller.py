@@ -5,7 +5,7 @@ from flask import jsonify, render_template
 from config import Config
 from model import sheet
 from service import jira_service, teams_service
-from util import delete_response, get_responses
+from util import delete_response, get_responses, save_result, get_result
 
 
 class TicketController:
@@ -28,11 +28,20 @@ class TicketController:
 
             logging.info(f"Data: {data}")
             if not data:
-                return render_template('not_found.html')
+                result = get_result(id)
+                if not result:
+                    return render_template('not_found.html')
+                else:
+                    if not result["key"]:
+                        return render_template('not_found.html')
+
+                    jira_url = Config.JIRA_URL + "/browse/" + result["key"]
+                    return render_template('accept.html', data=result, jira_url=jira_url)
 
             response = self.jira_service.create_issue(data)
             jira_url = Config.JIRA_URL + "/browse/" + response["key"]
 
+            save_result(data, response["key"])
             delete_response(id)
 
             self.send_message_to_team_service.send_message_for_accept(data, response["key"])
@@ -47,7 +56,16 @@ class TicketController:
             response = delete_response(id)
             logging.info(f"Response: {response}")
             if not response:
-                return render_template('not_found.html')
+                result = get_result(id)
+                if not result:
+                    return render_template('not_found.html')
+                else:
+                    if result["key"]:
+                        return render_template('not_found.html')
+
+                    return render_template('reject.html', response=result)
+
+            save_result(response)
 
             self.send_message_to_team_service.send_message_for_reject(response)
 
