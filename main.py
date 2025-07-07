@@ -4,9 +4,10 @@ from flask_cors import CORS
 from config import Config
 from controller import sheet_controller, ticket_controller
 from pkg.jira import JiraClient
+from pkg.smtp import SMTPClient
 from repository import jira_repository, sheet_repository, teams_repository
 from route import create_routes
-from service import jira_service, sheet_service, teams_service
+from service import jira_service, sheet_service, teams_service, notif_service
 
 app = Flask(__name__)
 
@@ -21,6 +22,13 @@ jira_client = JiraClient(
     team_id=Config.JIRA_TEAM_ID
 )
 
+smtp_client = SMTPClient(
+    Config.SMTP_SERVER,
+    Config.SMTP_PORT,
+    Config.SMTP_USERNAME,
+    Config.SMTP_PASSWORD
+)
+
 google_sheet_repository = sheet_repository.GoogleSheetRepositoryRepository(Config.SHEET_CREDENTIAL_FILE, Config.SHEET_ID)
 teams_repository = teams_repository.TeamsRepositoryRepository()
 ticket_repository = jira_repository.JiraRepository(client=jira_client)
@@ -29,6 +37,7 @@ get_all_responses_service = sheet_service.GetAllGoogleSheetResponsesService(goog
 delete_all_responses_service = sheet_service.DeleteAllGoogleSheetResponsesService(google_sheet_repository)
 send_message_to_team_service = teams_service.SendTeamsMessageService(teams_repository)
 ticket_service = jira_service.JiraService(ticket_repository)
+notif_service = notif_service.NotifService(smtp_client)
 
 google_sheet_controller = sheet_controller.GoogleSheetController(
         get_all_responses_service,

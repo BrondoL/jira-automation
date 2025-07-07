@@ -1,10 +1,11 @@
 import logging
 
-from util import get_user
+from util import get_user, update_result_status, delete_result
+from repository.jira_repository import JiraRepository
 
 
 class JiraService:
-    def __init__(self, repository):
+    def __init__(self, repository: JiraRepository):
         self.repository = repository
 
     def get_tickets_in_progress(self):
@@ -60,3 +61,20 @@ class JiraService:
         response = self.repository.create_issue(data, account_id, reporter_id)
 
         return response
+
+    def check_status(self, key, status):
+        ticket = self.repository.find_ticket_by_key(key)
+        if not ticket:
+            return None
+
+        current_status = ticket["fields"]["status"]["name"]
+        if status != current_status:
+            update_result_status(key, current_status)
+
+            if current_status == "In Progress":
+                return current_status
+            elif current_status == "Done":
+                delete_result(key)
+                return current_status
+
+        return None

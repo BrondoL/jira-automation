@@ -22,6 +22,13 @@ class Config:
   SHEET_ID = os.getenv('SHEET_ID')
   SHEET_CREDENTIAL_FILE = os.getenv('SHEET_CREDENTIAL_FILE')
 
+  SMTP_SERVER = os.getenv('SMTP_SERVER')
+  SMTP_PORT = os.getenv('SMTP_PORT')
+  SMTP_USERNAME = os.getenv('SMTP_USERNAME')
+  SMTP_PASSWORD =os.getenv('SMTP_PASSWORD')
+  EMAIL_FROM = os.getenv('EMAIL_FROM')
+  EMAIL_CC = os.getenv('EMAIL_CC')
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(levelname)s: %(asctime)s pid:%(process)s module:%(module)s %(message)s',

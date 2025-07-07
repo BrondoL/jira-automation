@@ -1,5 +1,7 @@
+from pkg.jira import JiraClient
+
 class JiraRepository():
-    def __init__(self, client):
+    def __init__(self, client: JiraClient):
         self.jira_client = client
 
     def find_tickets_created_today(self):
@@ -39,3 +41,13 @@ class JiraRepository():
             return None
 
         return users[0]
+
+    def find_ticket_by_key(self, key):
+        query = f'key = "{key}"'
+        field = "status,comment,attachment"
+
+        tickets = self.jira_client.search_jira_issues(query, field)
+        if not len(tickets):
+            return None
+
+        return tickets[0]

@@ -24,6 +24,7 @@ def create_routes(
     api.route('/tickets/evening', methods=['GET'])(ticket_controller.evening)
     api.route('/tickets/resend', methods=["GET"])(ticket_controller.resend)
     api.route('/tickets/incomplete', methods=["GET"])(ticket_controller.incomplete)
+    api.route('/tickets/check-status', methods=['GET'])(ticket_controller.check_status)
 
     # ================================
 

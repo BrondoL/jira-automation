@@ -1,10 +1,7 @@
-import json
-import os
 from typing import List
 
 from model import sheet
 from util import save_response
-
 
 class GetAllGoogleSheetResponsesService:
     def __init__(self, repository):

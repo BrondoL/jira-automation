@@ -105,9 +105,42 @@ def save_result(response, ticket_number=None):
     data = get_results()
 
     response["key"] = ticket_number
+    if ticket_number:
+        response["status"] = "To Do"
     # Append the new response data to the existing data
     data[response["__PowerAppsId__"]] = {key: value for key, value in response.items() if key != "__PowerAppsId__"}
 
     # Write the updated data back to the JSON file
     with open(result_path, "w") as json_file:
         json.dump(data, json_file, indent=4)
+
+def update_result_status(id, status):
+    results = get_results()
+
+    if id not in results:
+        logging.warning(f"Result with ID {id} not found.")
+        return None
+
+    results[id]["status"] = status
+
+    # Write the updated data back to the JSON file
+    with open(result_path, "w") as json_file:
+        json.dump(results, json_file, indent=4)
+
+    logging.info(f"Result with ID {id} has been updated to status '{status}'.")
+
+def delete_result(id):
+    results = get_results()
+
+    if id not in results:
+        logging.warning(f"Result with ID {id} not found.")
+        return None
+
+    del results[id]
+
+    # Write the updated data back to the JSON file
+    with open(result_path, "w") as json_file:
+        json.dump(results, json_file, indent=4)
+
+    logging.info(f"Result with ID {id} has been deleted.")
+    return id
