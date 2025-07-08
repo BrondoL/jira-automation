@@ -46,7 +46,8 @@ google_sheet_controller = sheet_controller.GoogleSheetController(
     )
 tickets_controller = ticket_controller.TicketController(
     send_message_to_team_service,
-    ticket_service
+    ticket_service,
+    notif_service
 )
 
 api, web = create_routes(
