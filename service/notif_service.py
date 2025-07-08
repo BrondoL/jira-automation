@@ -43,7 +43,7 @@ class NotifService:
             body = html.substitute(
                 ticket_id=ticket.get("id"),
                 ticket_title=ticket.get("title"),
-                ticket_assginee=ticket.get("assignee"),
+                ticket_assignee=ticket.get("assignee"),
                 ticket_priority=ticket.get("priority"),
                 customer_name=ticket.get("customer"),
                 jira_url=self.jira_url
@@ -52,7 +52,7 @@ class NotifService:
             self.smtp_client.send_email(
                 subject=f"[Ticket #{ticket.get('id')}] Request Accepted",
                 sender_email=self.sender_email,
-                receiver_emails=email,
+                receivers_email=email,
                 cc=self.cc_email,
                 body=body,
             )
@@ -86,7 +86,7 @@ class NotifService:
 
             body = html.substitute(
                 ticket_title=ticket.get("title"),
-                ticket_assginee=ticket.get("assignee"),
+                ticket_assignee=ticket.get("assignee"),
                 ticket_priority=ticket.get("priority"),
                 customer_name=ticket.get("customer"),
                 jira_url=self.jira_url
@@ -95,7 +95,7 @@ class NotifService:
             self.smtp_client.send_email(
                 subject="[Ticket #] Request Rejected",
                 sender_email=self.sender_email,
-                receiver_emails=email,
+                receivers_email=email,
                 cc=self.cc_email,
                 body=body,
             )
@@ -139,7 +139,7 @@ class NotifService:
             body = html.substitute(
                 ticket_id=ticket.get("id"),
                 ticket_title=ticket.get("title"),
-                ticket_assginee=ticket.get("assignee"),
+                ticket_assignee=ticket.get("assignee"),
                 ticket_priority=ticket.get("priority"),
                 customer_name=ticket.get("customer"),
                 jira_url=self.jira_url
@@ -148,7 +148,7 @@ class NotifService:
             self.smtp_client.send_email(
                 subject=f"[Ticket #{ticket.get('id')}] Request In Progress",
                 sender_email=self.sender_email,
-                receiver_emails=email,
+                receivers_email=email,
                 cc=self.cc_email,
                 body=body,
             )
@@ -195,7 +195,7 @@ class NotifService:
             body = html.substitute(
                 ticket_id=ticket.get("id"),
                 ticket_title=ticket.get("title"),
-                ticket_assginee=ticket.get("assignee"),
+                ticket_assignee=ticket.get("assignee"),
                 ticket_priority=ticket.get("priority"),
                 customer_name=ticket.get("customer"),
                 jira_url=self.jira_url
@@ -204,7 +204,7 @@ class NotifService:
             self.smtp_client.send_email(
                 subject=f"[Ticket #{ticket.get('id')}] Request Completed",
                 sender_email=self.sender_email,
-                receiver_emails=email,
+                receivers_email=email,
                 cc=self.cc_email,
                 body=body,
             )

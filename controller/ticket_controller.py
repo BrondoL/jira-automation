@@ -192,7 +192,7 @@ class TicketController:
 
                 tickets.append(ticket)
 
-            return jsonify(ticket)
+            return jsonify(tickets)
         except Exception as e:
             logging.error(f"error: {e}", exc_info=True)
             return jsonify({"message": "Internal Server Error"}), 500
