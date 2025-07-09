@@ -62,19 +62,19 @@ class JiraService:
 
         return response
 
-    def check_status(self, key, status):
+    def check_status(self, id, key, status):
         ticket = self.repository.find_ticket_by_key(key)
         if not ticket:
             return None
 
         current_status = ticket["fields"]["status"]["name"]
         if status != current_status:
-            update_result_status(key, current_status)
+            update_result_status(id, current_status)
 
             if current_status == "In Progress":
                 return current_status
             elif current_status == "Done":
-                delete_result(key)
+                delete_result(id)
                 return current_status
 
         return None

@@ -165,13 +165,17 @@ class TicketController:
             # Get data dari results.json
             results = get_results()
             # filter data yang statusnya belum "Done" dan keynya tidak None
-            data = [result for result in results.values() if result.get("status", None) != "Done" and result.get("key") != None]
-            tickets = []
+            data = []
+            for key,value in results.items():
+                if value.get("status", None) != "Done" and value.get("key") != None:
+                    value["id"] = key
+                    data.append(value)
 
+            tickets = []
             for ticket in data:
                 # Check status sekarang di jira, jika statusnya berubah, maka akan diupdate statusnya di resuls.json
                 status_before = ticket.get("status", None)
-                status = self.jira_service.check_status(ticket.get("key"), ticket.get("status", None))
+                status = self.jira_service.check_status(ticket.get("id"), ticket.get("key"), ticket.get("status", None))
 
                 reporter = ticket["Reporter"]
                 customer = ticket["Reporter"].split("@")[0]
