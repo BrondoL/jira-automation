@@ -6,6 +6,7 @@ from service.teams_service import SendTeamsMessageService
 from model.form import FormSchema
 from marshmallow import ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
+from model.sheet import GoogleSheetResponse
 
 class FormController:
     def __init__(
@@ -26,8 +27,8 @@ class FormController:
             data = form_schema.load(json_data)
 
             form = self.form_service.save_response(data)
-
-            self.team_service.send_message_for_new_ticket({"data":form})
+            response = GoogleSheetResponse(id=1, data=form)
+            self.team_service.send_message_for_new_ticket(response)
 
             return jsonify(form), 201
         except Exception as e:

@@ -44,7 +44,7 @@ tickets_controller = ticket_controller.TicketController(
     notif_service
 )
 
-form_controller = form_controller.FormController(form_service, notif_service)
+form_controller = form_controller.FormController(form_service, send_message_to_team_service)
 
 api, web = create_routes(
     tickets_controller,

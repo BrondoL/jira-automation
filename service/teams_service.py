@@ -1,5 +1,4 @@
 import logging
-import time
 
 from model import teams
 from util import get_user, get_value
