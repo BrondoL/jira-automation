@@ -13,7 +13,9 @@ class GetAllGoogleSheetResponsesService:
         response_data = []
         for response in responses:
             response_data.append(response.data)
-        save_response(response_data)
+        if len(response_data) > 0:
+            # Save the responses to a persistent storage or file
+            save_response(response_data)
 
         return [sheet.GoogleSheetResponseDTO(id=resp.id, data=resp.data) for resp in responses]
 
