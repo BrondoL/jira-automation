@@ -2,12 +2,12 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from config import Config
-from controller import sheet_controller, ticket_controller, form_controller
+from controller import ticket_controller, form_controller
 from pkg.jira import JiraClient
 from pkg.smtp import SMTPClient
-from repository import jira_repository, sheet_repository, teams_repository, form_repository
+from repository import jira_repository, teams_repository, form_repository
 from route import create_routes
-from service import jira_service, sheet_service, teams_service, notif_service, form_service
+from service import jira_service, teams_service, notif_service, form_service
 
 app = Flask(__name__)
 
@@ -29,23 +29,15 @@ smtp_client = SMTPClient(
     Config.SMTP_PASSWORD
 )
 
-google_sheet_repository = sheet_repository.GoogleSheetRepositoryRepository(Config.SHEET_CREDENTIAL_FILE, Config.SHEET_ID)
 teams_repository = teams_repository.TeamsRepositoryRepository()
 ticket_repository = jira_repository.JiraRepository(client=jira_client)
 form_repository = form_repository.FormRepository()
 
-get_all_responses_service = sheet_service.GetAllGoogleSheetResponsesService(google_sheet_repository)
-delete_all_responses_service = sheet_service.DeleteAllGoogleSheetResponsesService(google_sheet_repository)
 send_message_to_team_service = teams_service.SendTeamsMessageService(teams_repository)
 ticket_service = jira_service.JiraService(ticket_repository)
 notif_service = notif_service.NotifService(smtp_client)
 form_service = form_service.FormService(form_repository)
 
-google_sheet_controller = sheet_controller.GoogleSheetController(
-        get_all_responses_service,
-        delete_all_responses_service,
-        send_message_to_team_service
-    )
 tickets_controller = ticket_controller.TicketController(
     send_message_to_team_service,
     ticket_service,
@@ -55,7 +47,6 @@ tickets_controller = ticket_controller.TicketController(
 form_controller = form_controller.FormController(form_service, notif_service)
 
 api, web = create_routes(
-    google_sheet_controller,
     tickets_controller,
     form_controller
 )

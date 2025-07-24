@@ -1,11 +1,10 @@
 from flask import Blueprint, jsonify, request
 
 from config import Config
-from controller import sheet_controller, ticket_controller, form_controller
+from controller import ticket_controller, form_controller
 
 
 def create_routes(
-    sheet_controller: sheet_controller.GoogleSheetController,
     ticket_controller: ticket_controller.TicketController,
     form_controller: form_controller.FormController
 ):
@@ -20,7 +19,6 @@ def create_routes(
         if token != expected_token:
             return jsonify({'error': 'Unauthorized'}), 401
 
-    api.route('/google-sheet/responses', methods=['GET'])(sheet_controller.get_all_responses)
     api.route('/tickets/morning', methods=['GET'])(ticket_controller.morning)
     api.route('/tickets/evening', methods=['GET'])(ticket_controller.evening)
     api.route('/tickets/resend', methods=["GET"])(ticket_controller.resend)
