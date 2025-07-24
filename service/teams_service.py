@@ -9,17 +9,15 @@ class SendTeamsMessageService:
     def __init__(self, repository):
         self.repository = repository
 
-    def send_message_for_new_ticket(self, responses) -> teams.TeamsMessageResponseDTO:
-        for response in responses:
-            data = response.data
-            user = get_user(data["Assignee"])
-            if not user:
-                raise Exception("User not found!")
+    def send_message_for_new_ticket(self, response) -> teams.TeamsMessageResponseDTO:
+        data = response.data
+        user = get_user(data["Assignee"])
+        if not user:
+            raise Exception("User not found!")
 
-            ok = self.repository.send_message_for_new_ticket(user, data)
-            if not ok:
-                logging.warning(f"Error when notify this ticket: {data['__PowerAppsId__']}")
-            time.sleep(2)
+        ok = self.repository.send_message_for_new_ticket(user, data)
+        if not ok:
+            logging.warning(f"Error when notify this ticket: {data['__PowerAppsId__']}")
 
     def send_message_for_morning_update(self, in_progress, done):
         formatted_in_progress = ""

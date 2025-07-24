@@ -1,12 +1,13 @@
 from flask import Blueprint, jsonify, request
 
 from config import Config
-from controller import sheet_controller, ticket_controller
+from controller import sheet_controller, ticket_controller, form_controller
 
 
 def create_routes(
     sheet_controller: sheet_controller.GoogleSheetController,
-    ticket_controller: ticket_controller.TicketController
+    ticket_controller: ticket_controller.TicketController,
+    form_controller: form_controller.FormController
 ):
     api = Blueprint('api', __name__)
 
@@ -26,6 +27,7 @@ def create_routes(
     api.route('/tickets/incomplete', methods=["GET"])(ticket_controller.incomplete)
     api.route('/tickets/check-status', methods=['GET'])(ticket_controller.check_status)
 
+    api.route('/form', methods=['POST'])(form_controller.store)
     # ================================
 
     web = Blueprint('web', __name__)

@@ -140,7 +140,8 @@ class TicketController:
                     data=record
                 ) for i, record in enumerate(responses)
             ]
-            self.send_message_to_team_service.send_message_for_new_ticket(responses)
+            for response in responses:
+                self.send_message_to_team_service.send_message_for_new_ticket(response)
 
             return jsonify({"message": "ok"})
         except Exception as e:

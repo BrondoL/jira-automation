@@ -22,7 +22,8 @@ class GoogleSheetController:
             if not len(responses):
                 return jsonify({"message": "no response found in google sheets"}), 404
 
-            self.send_message_to_team_service.send_message_for_new_ticket(responses)
+            for response in responses:
+                self.send_message_to_team_service.send_message_for_new_ticket(response)
 
             ok = self.delete_all_responses_service.execute()
             if not ok:
