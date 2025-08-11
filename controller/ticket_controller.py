@@ -88,12 +88,17 @@ class TicketController:
                     if not result:
                         return render_template('not_found.html')
                     else:
-                        # jika ada, namun belum pernah dibuatkan tiket jira, maka render not found
+                        # jika ada, namun sudah pernah dibuatkan tiket jira, maka accept.html
                         if result["key"]:
-                            return render_template('not_found.html')
+                            jira_url = Config.JIRA_URL + "/browse/" + result["key"]
+                            return render_template('accept.html', data=result, jira_url=jira_url)
 
-                        # Jika ada, maka tampilkan form reject
-                        return render_template('reject.html', response=result, rejected=False)
+                        # Jika sudah pernah direject, tampilkan reasonnya
+                        if result.get("rejection_reason"):
+                            return render_template('reject.html', response=result, rejected=True, rejection_reason=result.get("rejection_reason"))
+
+                        data = result
+                        data["__PowerAppsId__"] = id
 
                 # Tampilkan form reject
                 return render_template('reject.html', response=data, rejected=False)
@@ -101,23 +106,6 @@ class TicketController:
             # Handle POST request - process rejection with reason
             elif request.method == 'POST':
                 rejection_reason = request.form.get('rejection_reason', '').strip()
-
-                if not rejection_reason:
-                    # If no reason provided, redirect back to form with error
-                    responses = get_responses()
-                    data = None
-                    for response in responses:
-                        if response["__PowerAppsId__"] == id:
-                            data = response
-                            break
-
-                    if not data:
-                        result = get_result(id)
-                        if not result:
-                            return render_template('not_found.html')
-                        data = result
-
-                    return render_template('reject.html', response=data, rejected=False, error="Rejection reason is required")
 
                 # Delete response from responses.json, and return the data
                 response = delete_response(id)
@@ -131,27 +119,17 @@ class TicketController:
                     if not result:
                         return render_template('not_found.html')
                     else:
-                        # jika ada, namun belum pernah dibuatkan tiket jira, maka render not found
+                        # jika ada, namun sudah pernah dibuatkan tiket jira dan reasonnya, maka render not found
                         if result["key"]:
-                            return render_template('not_found.html')
+                            jira_url = Config.JIRA_URL + "/browse/" + result["key"]
+                            return render_template('accept.html', data=result, jira_url=jira_url)
 
-                        # Jika ada, maka simpan hasil rejection dengan reason
-                        result["rejection_reason"] = rejection_reason
-                        save_result(result)
+                        if result["rejection_reason"]:
+                            return render_template('reject.html', response=result, rejected=True, rejection_reason=result.get("rejection_reason"))
 
-                        self.send_message_to_team_service.send_message_for_reject(result, rejection_reason)
-
-                        customer = result["Reporter"].split("@")[0]
-                        ticket = {
-                            "title": result["Summary"],
-                            "assignee": result["Assignee"],
-                            "priority": result["Priority"],
-                            "customer": customer,
-                            "rejection_reason": rejection_reason
-                        }
-                        self.notif_service.reject_notification(ticket, result["Reporter"])
-
-                        return render_template('reject.html', response=result, rejected=True, rejection_reason=rejection_reason)
+                if not rejection_reason:
+                    # If no reason provided, redirect back to form with error
+                    return render_template('reject.html', response=data, rejected=False, error="Rejection reason is required")
 
                 # Jika ada response, maka simpan hasilnya ke results.json dengan rejection reason
                 response["rejection_reason"] = rejection_reason
