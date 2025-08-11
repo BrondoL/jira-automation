@@ -63,6 +63,10 @@ class NotifService:
 
     def reject_notification(self, ticket, email: str):
         try:
+            rejection_reason_html = ""
+            if ticket.get("rejection_reason"):
+                rejection_reason_html = f"<li><strong>Rejection Reason:</strong> {ticket.get('rejection_reason')}</li>"
+
             html = Template("""\
                 <!DOCTYPE html>
                 <html>
@@ -70,13 +74,14 @@ class NotifService:
                     <h2 style="color: #F44336;">[Ticket #] Request Rejected</h2>
                     <p>Dear $customer_name,</p>
 
-                    <p>Your request has been <strong>rejected</strong>. Please ask the assginee for the reason.</p>
+                    <p>Your request has been <strong>rejected</strong>.</p>
 
                     <ul>
                     <li><strong>Title:</strong> $ticket_title</li>
                     <li><strong>Assignee:</strong> $ticket_assignee</li>
                     <li><strong>Priority:</strong> $ticket_priority</li>
                     <li><strong>Status:</strong> Rejected</li>
+                    $rejection_reason_html
                     </ul>
 
                     <p>Thank you,<br>SRE Core</p>
@@ -89,6 +94,7 @@ class NotifService:
                 ticket_assignee=ticket.get("assignee"),
                 ticket_priority=ticket.get("priority"),
                 customer_name=ticket.get("customer"),
+                rejection_reason_html=rejection_reason_html,
                 jira_url=self.jira_url
             )
 

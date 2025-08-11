@@ -116,12 +116,12 @@ class SendTeamsMessageService:
         if not ok:
             logging.warning(f"Error when notify evening updates")
 
-    def send_message_for_reject(self, response):
+    def send_message_for_reject(self, response, rejection_reason=None):
         user = get_user(response["Assignee"])
         if not user:
             raise Exception("User not found!")
 
-        ok = self.repository.send_message_for_reject(user, response)
+        ok = self.repository.send_message_for_reject(user, response, rejection_reason)
         if not ok:
             logging.warning(f"Error when notify reject this ticket: {response['__PowerAppsId__']}")
 

@@ -1,6 +1,6 @@
 import logging
 
-from flask import jsonify, render_template
+from flask import jsonify, render_template, request
 
 from config import Config
 from model import sheet
@@ -70,39 +70,107 @@ class TicketController:
 
     def reject(self, id):
         try:
-            # Delete response from responses.json, and return the data
-            response = delete_response(id)
-            logging.info(f"Response: {response}")
-            # jika tidak ada data
-            if not response:
-                # ambil dari results.json
-                result = get_result(id)
-                # jika tidak ada juga, maka render not found
-                if not result:
-                    return render_template('not_found.html')
-                else:
-                    # jika ada, namun belum pernah dibuatkan tiket jira, maka render not found
-                    if result["key"]:
+            # Handle GET request - show rejection form
+            if request.method == 'GET':
+                responses = get_responses()
+                data = None
+
+                # Mencari data dari google sheet responses
+                for response in responses:
+                    if response["__PowerAppsId__"] == id:
+                        data = response
+                        break
+
+                # Jika tidak ada, maka akan mencari data dari hasil yang sudah disimpan
+                if not data:
+                    result = get_result(id)
+                    # Jika tidak ketemu, maka render not found
+                    if not result:
                         return render_template('not_found.html')
+                    else:
+                        # jika ada, namun belum pernah dibuatkan tiket jira, maka render not found
+                        if result["key"]:
+                            return render_template('not_found.html')
 
-                    # Jika ada, maka render reject.html
-                    return render_template('reject.html', response=result)
+                        # Jika ada, maka tampilkan form reject
+                        return render_template('reject.html', response=result, rejected=False)
 
-            # Jika ada response, maka simpan hasilnya ke results.json
-            save_result(response)
+                # Tampilkan form reject
+                return render_template('reject.html', response=data, rejected=False)
 
-            self.send_message_to_team_service.send_message_for_reject(response)
+            # Handle POST request - process rejection with reason
+            elif request.method == 'POST':
+                rejection_reason = request.form.get('rejection_reason', '').strip()
 
-            customer = response["Reporter"].split("@")[0]
-            ticket = {
-                "title": response["Summary"],
-                "assignee": response["Assignee"],
-                "priority": response["Priority"],
-                "customer": customer
-            }
-            self.notif_service.reject_notification(ticket, response["Reporter"])
+                if not rejection_reason:
+                    # If no reason provided, redirect back to form with error
+                    responses = get_responses()
+                    data = None
+                    for response in responses:
+                        if response["__PowerAppsId__"] == id:
+                            data = response
+                            break
 
-            return render_template('reject.html', response=response)
+                    if not data:
+                        result = get_result(id)
+                        if not result:
+                            return render_template('not_found.html')
+                        data = result
+
+                    return render_template('reject.html', response=data, rejected=False, error="Rejection reason is required")
+
+                # Delete response from responses.json, and return the data
+                response = delete_response(id)
+                logging.info(f"Response: {response}")
+
+                # jika tidak ada data
+                if not response:
+                    # ambil dari results.json
+                    result = get_result(id)
+                    # jika tidak ada juga, maka render not found
+                    if not result:
+                        return render_template('not_found.html')
+                    else:
+                        # jika ada, namun belum pernah dibuatkan tiket jira, maka render not found
+                        if result["key"]:
+                            return render_template('not_found.html')
+
+                        # Jika ada, maka simpan hasil rejection dengan reason
+                        result["rejection_reason"] = rejection_reason
+                        save_result(result)
+
+                        self.send_message_to_team_service.send_message_for_reject(result, rejection_reason)
+
+                        customer = result["Reporter"].split("@")[0]
+                        ticket = {
+                            "title": result["Summary"],
+                            "assignee": result["Assignee"],
+                            "priority": result["Priority"],
+                            "customer": customer,
+                            "rejection_reason": rejection_reason
+                        }
+                        self.notif_service.reject_notification(ticket, result["Reporter"])
+
+                        return render_template('reject.html', response=result, rejected=True, rejection_reason=rejection_reason)
+
+                # Jika ada response, maka simpan hasilnya ke results.json dengan rejection reason
+                response["rejection_reason"] = rejection_reason
+                save_result(response)
+
+                self.send_message_to_team_service.send_message_for_reject(response, rejection_reason)
+
+                customer = response["Reporter"].split("@")[0]
+                ticket = {
+                    "title": response["Summary"],
+                    "assignee": response["Assignee"],
+                    "priority": response["Priority"],
+                    "customer": customer,
+                    "rejection_reason": rejection_reason
+                }
+                self.notif_service.reject_notification(ticket, response["Reporter"])
+
+                return render_template('reject.html', response=response, rejected=True, rejection_reason=rejection_reason)
+
         except Exception as e:
             logging.error(f"error: {e}", exc_info=True)
             return jsonify({"message": "Internal Server Error"}), 500

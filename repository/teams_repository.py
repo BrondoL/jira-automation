@@ -355,7 +355,33 @@ class TeamsRepositoryRepository():
 
         return response.status_code == 202
 
-    def send_message_for_reject(self, user, data):
+    def send_message_for_reject(self, user, data, rejection_reason=None):
+        facts = [
+            {
+                "title": "Summary:",
+                "value": data["Summary"]
+            },
+            {
+                "title": "Assignee:",
+                "value": data["Assignee"]
+            },
+            {
+                "title": "Requestor:",
+                "value": data["Reporter"]
+            },
+            {
+                "title": "Priority:",
+                "value": data["Priority"]
+            }
+        ]
+
+        # Add rejection reason if provided
+        if rejection_reason:
+            facts.append({
+                "title": "Rejection Reason:",
+                "value": rejection_reason
+            })
+
         payload = {
             "type": "message",
             "attachments": [
@@ -428,24 +454,7 @@ class TeamsRepositoryRepository():
                     },
                     {
                         "type": "FactSet",
-                        "facts": [
-                        {
-                            "title": "Summary:",
-                            "value": data["Summary"]
-                        },
-                        {
-                            "title": "Assignee:",
-                            "value": data["Assignee"]
-                        },
-                        {
-                            "title": "Requestor:",
-                            "value": data["Reporter"]
-                        },
-                        {
-                            "title": "Priority:",
-                            "value": data["Priority"]
-                        }
-                        ]
+                        "facts": facts
                     }
                     ],
                     "msteams": {
