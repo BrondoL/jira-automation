@@ -33,6 +33,9 @@ case "$1" in
     check)
         send_curl_request "$HOST/api/google-sheet/responses?token=$TOKEN" 900  # 15 minutes in seconds
         ;;
+    status)
+        send_curl_request "$HOST/api/tickets/check-status?token=$TOKEN" 900  # 15 minutes in seconds
+        ;;
     *)
         echo "Error: Invalid parameter. Use one of the following: morning, evening, resend, check"
         exit 1
