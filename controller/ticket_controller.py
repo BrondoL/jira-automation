@@ -6,6 +6,7 @@ from config import Config
 from model import sheet
 from service import jira_service, teams_service, notif_service
 from util import delete_response, get_responses, save_result, get_result, get_results
+from constant.status import Status
 
 class TicketController:
     def __init__(
@@ -214,7 +215,7 @@ class TicketController:
             # filter data yang statusnya belum "Done" dan keynya tidak None
             data = []
             for key,value in results.items():
-                if value.get("status", None) != "Done" and value.get("key") != None:
+                if value.get("status", None) != Status.DONE and value.get("key") != None:
                     value["id"] = key
                     data.append(value)
 
@@ -236,9 +237,9 @@ class TicketController:
                     "current_status" : status
                 }
 
-                if status == "In Progress":
+                if status == Status.IN_PROGRESS:
                     self.notif_service.in_progress_notification(ticket, reporter)
-                elif status == "Done":
+                elif status == Status.DONE:
                     self.notif_service.done_notification(ticket, reporter)
 
                 tickets.append(ticket)

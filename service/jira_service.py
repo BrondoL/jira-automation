@@ -2,6 +2,7 @@ import logging
 
 from util import get_user, update_result_status, delete_result
 from repository.jira_repository import JiraRepository
+from constant.status import Status
 
 
 class JiraService:
@@ -71,9 +72,9 @@ class JiraService:
         if status != current_status:
             update_result_status(id, current_status)
 
-            if current_status == "In Progress":
+            if current_status == Status.IN_PROGRESS:
                 return current_status
-            elif current_status == "Done":
+            elif current_status == Status.DONE:
                 delete_result(id)
                 return current_status
 
