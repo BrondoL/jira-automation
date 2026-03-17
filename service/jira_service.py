@@ -72,9 +72,9 @@ class JiraService:
         if status != current_status:
             update_result_status(id, current_status)
 
-            if current_status == Status.IN_PROGRESS:
+            if current_status == Status.IN_PROGRESS.value:
                 return current_status
-            elif current_status == Status.DONE:
+            elif current_status == Status.DONE.value:
                 delete_result(id)
                 return current_status
 

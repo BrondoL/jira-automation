@@ -215,7 +215,7 @@ class TicketController:
             # filter data yang statusnya belum "Done" dan keynya tidak None
             data = []
             for key,value in results.items():
-                if value.get("status", None) != Status.DONE and value.get("key") != None:
+                if value.get("status", None) != Status.DONE.value and value.get("key") != None:
                     value["id"] = key
                     data.append(value)
 
@@ -237,9 +237,9 @@ class TicketController:
                     "current_status" : status
                 }
 
-                if status == Status.IN_PROGRESS:
+                if status == Status.IN_PROGRESS.value:
                     self.notif_service.in_progress_notification(ticket, reporter)
-                elif status == Status.DONE:
+                elif status == Status.DONE.value:
                     self.notif_service.done_notification(ticket, reporter)
 
                 tickets.append(ticket)
