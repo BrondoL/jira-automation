@@ -71,8 +71,8 @@ class TicketController:
 
     def reject(self, id):
         try:
-            # Handle GET request - show rejection form
-            if request.method == 'GET':
+            # Handle GET and HEAD request - show rejection form
+            if request.method in ['GET', 'HEAD']:
                 responses = get_responses()
                 data = None
 
