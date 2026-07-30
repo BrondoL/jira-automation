@@ -31,6 +31,6 @@ def create_routes(
     web = Blueprint('web', __name__)
 
     web.route('/tickets/reject/<id>', methods=['GET', 'POST'])(ticket_controller.reject)
-    web.route('/tickets/accept/<id>', methods=['GET'])(ticket_controller.accept)
+    web.route('/tickets/accept/<id>', methods=['GET', 'POST'])(ticket_controller.accept)
 
     return api, web

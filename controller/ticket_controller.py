@@ -21,50 +21,74 @@ class TicketController:
 
     def accept(self, id):
         try:
-            responses = get_responses()
-            data = None
+            # Handle GET and HEAD request - show confirmation form
+            if request.method in ['GET', 'HEAD']:
+                responses = get_responses()
+                data = None
 
-            # Mencari data dari google sheet responses
-            for response in responses:
-                if response["__PowerAppsId__"] == id:
-                    data = response
-                    break
+                # Mencari data dari google sheet responses
+                for response in responses:
+                    if response["__PowerAppsId__"] == id:
+                        data = response
+                        break
 
-            logging.info(f"Data: {data}")
-            # Jika tidak ada, maka akan mencari data dari hasil yang sudah disimpan
-            if not data:
-                result = get_result(id)
-                # Jika tidak ketemu, maka render not found
-                if not result:
-                    return render_template('not_found.html')
-                else:
-                    # Jika ada, namun belum pernah dibuatkan tiket jira
-                    if not result["key"]:
+                # Jika tidak ada, maka akan mencari data dari hasil yang sudah disimpan
+                if not data:
+                    result = get_result(id)
+                    # Jika tidak ketemu, maka render not found
+                    if not result:
                         return render_template('not_found.html')
+                    else:
+                        # Jika ada, namun belum pernah dibuatkan tiket jira
+                        if not result["key"]:
+                            return render_template('not_found.html')
 
-                    # Jika ada, dan sudah dibuatkan tiket jira, maka render accept.html
-                    jira_url = Config.JIRA_URL + "/browse/" + result["key"]
-                    return render_template('accept.html', data=result, jira_url=jira_url)
+                        # Jika ada, dan sudah dibuatkan tiket jira, maka render accept.html
+                        jira_url = Config.JIRA_URL + "/browse/" + result["key"]
+                        return render_template('accept.html', data=result, jira_url=jira_url)
 
-            response = self.jira_service.create_issue(data)
-            jira_url = Config.JIRA_URL + "/browse/" + response["key"]
+                # Tampilkan form konfirmasi
+                return render_template('accept_confirm.html', response=data)
 
-            save_result(data, response["key"])
-            delete_response(id)
+            # Handle POST request - process acceptance
+            elif request.method == 'POST':
+                # Delete response from responses.json, and return the data
+                response = delete_response(id)
+                logging.info(f"Data: {response}")
 
-            self.send_message_to_team_service.send_message_for_accept(data, response["key"])
+                # jika tidak ada data
+                if not response:
+                    # ambil dari results.json
+                    result = get_result(id)
+                    # jika tidak ada juga, maka render not found
+                    if not result:
+                        return render_template('not_found.html')
+                    else:
+                        # jika ada, namun sudah pernah dibuatkan tiket jira, maka tampilkan ticket tersebut
+                        if result["key"]:
+                            jira_url = Config.JIRA_URL + "/browse/" + result["key"]
+                            return render_template('accept.html', data=result, jira_url=jira_url)
 
-            customer = data["Reporter"].split("@")[0]
-            ticket = {
-                "id": response["key"],
-                "title": data["Summary"],
-                "assignee": data["Assignee"],
-                "priority": data["Priority"],
-                "customer": customer
-            }
-            self.notif_service.accept_notification(ticket, data["Reporter"])
+                # Create Jira ticket
+                jira_response = self.jira_service.create_issue(response)
+                jira_url = Config.JIRA_URL + "/browse/" + jira_response["key"]
 
-            return render_template('accept.html', data=data, jira_url=jira_url)
+                save_result(response, jira_response["key"])
+
+                self.send_message_to_team_service.send_message_for_accept(response, jira_response["key"])
+
+                customer = response["Reporter"].split("@")[0]
+                ticket = {
+                    "id": jira_response["key"],
+                    "title": response["Summary"],
+                    "assignee": response["Assignee"],
+                    "priority": response["Priority"],
+                    "customer": customer
+                }
+                self.notif_service.accept_notification(ticket, response["Reporter"])
+
+                return render_template('accept.html', data=response, jira_url=jira_url)
+
         except Exception as e:
             logging.error(f"error: {e}", exc_info=True)
             return jsonify({"message": "Internal Server Error"}), 500
