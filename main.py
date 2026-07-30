@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from config import Config
 from controller import ticket_controller, form_controller
+from middleware import IPBlacklistMiddleware
 from pkg.jira import JiraClient
 from pkg.smtp import SMTPClient
 from repository import jira_repository, teams_repository, form_repository
@@ -12,6 +13,9 @@ from service import jira_service, teams_service, notif_service, form_service
 app = Flask(__name__)
 
 CORS(app, resources={r"/*": {"origins": "*"}}, allow_headers=['Content-Type', 'X-Requested-With', 'Authorization'])
+
+# Initialize IP blacklist middleware
+IPBlacklistMiddleware(app)
 
 jira_client = JiraClient(
     base_url=Config.JIRA_URL,
@@ -55,7 +59,11 @@ app.register_blueprint(web)
 
 @app.after_request
 def log_response_info(response):
-    app.logger.info(f'"{request.method} {request.url}" | {response.status} | IP: {request.remote_addr}')
+    # Get real IP from Cloudflare headers
+    real_ip = request.headers.get('CF-Connecting-IP') or \
+              request.headers.get('X-Forwarded-For', '').split(',')[0].strip() or \
+              request.remote_addr
+    app.logger.info(f'"{request.method} {request.url}" | {response.status} | IP: {real_ip}')
     return response
 
 @app.errorhandler(404)
