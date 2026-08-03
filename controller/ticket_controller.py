@@ -21,9 +21,9 @@ class TicketController:
 
     def accept(self, id):
         try:
-            # Only accept POST requests
-            if request.method != 'POST':
-                return jsonify({"message": "Method not allowed. Use POST to accept tickets."}), 405
+            # Only accept GET requests
+            if request.method != 'GET':
+                return jsonify({"message": "Method not allowed. Use GET to accept tickets."}), 405
 
             # Delete response from responses.json, and return the data
             response = delete_response(id)
